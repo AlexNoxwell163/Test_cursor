@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, Scissors, X } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const navLinks = [
   { href: "/", label: "Главная" },
@@ -17,6 +18,7 @@ const navLinks = [
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { user, initialized, logout } = useAuth();
 
   useEffect(() => {
     setOpen(false);
@@ -59,12 +61,35 @@ export default function Header() {
           })}
         </nav>
 
-        <Link
-          href="/booking"
-          className="hidden rounded-full border border-[var(--accent)] bg-[var(--accent)] px-5 py-2 text-sm font-medium text-[var(--background)] transition-colors hover:bg-[var(--accent-hover)] md:inline-flex"
-        >
-          Записаться
-        </Link>
+        <div className="hidden items-center gap-3 md:flex">
+          {initialized && user ? (
+            <>
+              <span className="max-w-[160px] truncate text-sm text-[var(--foreground-muted)]">
+                {user.name}
+              </span>
+              <button
+                type="button"
+                onClick={logout}
+                className="rounded-full border border-[var(--border-strong)] px-4 py-2 text-sm transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              >
+                Выйти
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/auth"
+              className="rounded-full border border-[var(--border-strong)] px-4 py-2 text-sm transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            >
+              Войти
+            </Link>
+          )}
+          <Link
+            href="/booking"
+            className="rounded-full border border-[var(--accent)] bg-[var(--accent)] px-5 py-2 text-sm font-medium text-[var(--background)] transition-colors hover:bg-[var(--accent-hover)]"
+          >
+            Записаться
+          </Link>
+        </div>
 
         <button
           type="button"
@@ -105,6 +130,22 @@ export default function Header() {
             >
               Записаться
             </Link>
+            {initialized && user ? (
+              <button
+                type="button"
+                onClick={logout}
+                className="mt-1 rounded-full border border-[var(--border-strong)] px-5 py-3 text-base text-[var(--foreground)]"
+              >
+                Выйти ({user.name})
+              </button>
+            ) : (
+              <Link
+                href="/auth"
+                className="mt-1 rounded-full border border-[var(--border-strong)] px-5 py-3 text-center text-base text-[var(--foreground)]"
+              >
+                Войти / Регистрация
+              </Link>
+            )}
           </nav>
         </div>
       )}

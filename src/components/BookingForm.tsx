@@ -18,6 +18,7 @@ import {
   getTodayISO,
 } from "@/lib/timeSlots";
 import type { Booking } from "@/types";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const slots = generateTimeSlots();
 
@@ -32,6 +33,7 @@ const errorClass = "mt-1 text-xs text-[var(--danger)]";
 export default function BookingForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
 
   const initialServiceId = searchParams.get("service") ?? "";
   const initialMasterId = searchParams.get("master") ?? "";
@@ -44,6 +46,7 @@ export default function BookingForm() {
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -52,8 +55,8 @@ export default function BookingForm() {
       masterId: initialMasterId,
       date: "",
       time: "",
-      name: "",
-      phone: "",
+      name: user?.name ?? "",
+      phone: user?.phone ?? "",
       comment: "",
     },
   });
@@ -82,6 +85,16 @@ export default function BookingForm() {
       setValue("masterId", "");
     }
   }, [availableMasters, selectedMasterId, setValue]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (!getValues("name")) {
+      setValue("name", user.name, { shouldDirty: false });
+    }
+    if (!getValues("phone") && user.phone) {
+      setValue("phone", user.phone, { shouldDirty: false });
+    }
+  }, [getValues, setValue, user]);
 
   const onSubmit = async (values: BookingFormValues) => {
     const service = services.find((item) => item.id === values.serviceId);

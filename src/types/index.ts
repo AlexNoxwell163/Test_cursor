@@ -51,3 +51,15 @@ export interface BookingDetails extends Booking {
   servicePrice: number;
   masterName: string;
 }
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+}
+
+export interface AuthUserRecord extends AuthUser {
+  password: string;
+  createdAt: string;
+}
