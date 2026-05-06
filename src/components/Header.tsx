@@ -1,0 +1,113 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Menu, Scissors, X } from "lucide-react";
+
+const navLinks = [
+  { href: "/", label: "Главная" },
+  { href: "/services", label: "Услуги" },
+  { href: "/masters", label: "Мастера" },
+  { href: "/gallery", label: "Галерея" },
+  { href: "/reviews", label: "Отзывы" },
+  { href: "/contacts", label: "Контакты" },
+];
+
+export default function Header() {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--background)]/85 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex items-center gap-2 font-serif text-xl">
+          <Scissors size={20} className="text-[var(--accent)]" />
+          <span className="tracking-wider">LUMIÈRE</span>
+        </Link>
+
+        <nav className="hidden items-center gap-7 md:flex">
+          {navLinks.map((link) => {
+            const isActive =
+              link.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm transition-colors ${
+                  isActive
+                    ? "text-[var(--accent)]"
+                    : "text-[var(--foreground-muted)] hover:text-[var(--foreground)]"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <Link
+          href="/booking"
+          className="hidden rounded-full border border-[var(--accent)] bg-[var(--accent)] px-5 py-2 text-sm font-medium text-[var(--background)] transition-colors hover:bg-[var(--accent-hover)] md:inline-flex"
+        >
+          Записаться
+        </Link>
+
+        <button
+          type="button"
+          aria-label="Открыть меню"
+          aria-expanded={open}
+          onClick={() => setOpen((prev) => !prev)}
+          className="inline-flex items-center justify-center rounded-md p-2 text-[var(--foreground)] transition-colors hover:bg-[var(--background-soft)] md:hidden"
+        >
+          {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </div>
+
+      {open && (
+        <div className="border-t border-[var(--border)] bg-[var(--background)] md:hidden">
+          <nav className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
+            {navLinks.map((link) => {
+              const isActive =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`rounded-md px-3 py-3 text-base ${
+                    isActive
+                      ? "bg-[var(--accent-soft)] text-[var(--accent)]"
+                      : "text-[var(--foreground)] hover:bg-[var(--background-soft)]"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            <Link
+              href="/booking"
+              className="mt-2 rounded-full bg-[var(--accent)] px-5 py-3 text-center text-base font-medium text-[var(--background)]"
+            >
+              Записаться
+            </Link>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}
