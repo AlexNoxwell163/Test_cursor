@@ -10,6 +10,7 @@ import {
 import ServiceCard from "@/components/ServiceCard";
 import SectionTitle from "@/components/SectionTitle";
 import ReviewCard from "@/components/ReviewCard";
+import QuickBookingBanner from "@/components/QuickBookingBanner";
 import { services } from "@/data/services";
 import { reviews } from "@/data/reviews";
 
@@ -46,6 +47,7 @@ const advantages = [
 export default function HomePage() {
   return (
     <div>
+      <QuickBookingBanner />
       <section className="relative isolate overflow-hidden">
         <div className="pointer-events-none absolute -left-20 top-16 -z-10 h-64 w-64 rounded-full bg-[var(--glow-rose)] blur-3xl" />
         <div className="pointer-events-none absolute -right-20 bottom-10 -z-10 h-72 w-72 rounded-full bg-[var(--glow-gold)] blur-3xl" />

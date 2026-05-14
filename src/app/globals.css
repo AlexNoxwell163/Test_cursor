@@ -37,6 +37,11 @@
   box-sizing: border-box;
 }
 
+/* Крупнее базовый кегль: все rem-размеры Tailwind масштабируются пропорционально */
+html {
+  font-size: 120%;
+}
+
 html,
 body {
   background: var(--background);
@@ -48,6 +53,7 @@ body {
 
 body {
   min-height: 100vh;
+  line-height: 1.65;
   background-image:
     radial-gradient(circle at 15% 10%, var(--glow-gold), transparent 35%),
     radial-gradient(circle at 80% 5%, var(--glow-rose), transparent 30%),

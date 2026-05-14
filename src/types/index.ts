@@ -44,12 +44,45 @@ export interface Booking {
   phone: string;
   comment?: string;
   createdAt: string;
+  /** Если запись с аккаунта — для лояльности и быстрой записи */
+  userId?: string;
+  /** Снимок цены услуги на момент записи */
+  servicePriceRub?: number;
+  depositRub?: number;
+  depositPaid?: boolean;
+  giftCertificateCode?: string;
+  giftCertificateAppliedRub?: number;
+  loyaltyDiscountPercent?: number;
+  /** Цена услуги после скидок (без депозита как предоплаты) */
+  finalServicePriceRub?: number;
 }
 
 export interface BookingDetails extends Booking {
   serviceName: string;
   servicePrice: number;
   masterName: string;
+}
+
+export interface GiftCertificate {
+  id: string;
+  code: string;
+  balanceInitial: number;
+  balanceRemaining: number;
+  createdAt: string;
+}
+
+export interface LoyaltyTier {
+  id: string;
+  name: string;
+  minPoints: number;
+  discountPercent: number;
+}
+
+export interface LoyaltyProfile {
+  userId: string;
+  points: number;
+  visits: number;
+  updatedAt: string;
 }
 
 export interface AuthUser {

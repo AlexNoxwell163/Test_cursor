@@ -67,6 +67,14 @@ export default function Footer() {
           >
             Записаться онлайн
           </Link>
+          <div className="mt-4 flex flex-col gap-2 text-sm">
+            <Link href="/gifts" className="text-[var(--foreground-muted)] hover:text-[var(--accent)]">
+              Подарочные сертификаты
+            </Link>
+            <Link href="/loyalty" className="text-[var(--foreground-muted)] hover:text-[var(--accent)]">
+              Программа лояльности
+            </Link>
+          </div>
         </div>
       </div>
       <div className="border-t border-[var(--border)]">

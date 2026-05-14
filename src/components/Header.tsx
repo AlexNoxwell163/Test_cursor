@@ -11,7 +11,6 @@ const navLinks = [
   { href: "/services", label: "Услуги" },
   { href: "/masters", label: "Мастера" },
   { href: "/gallery", label: "Галерея" },
-  { href: "/reviews", label: "Отзывы" },
   { href: "/contacts", label: "Контакты" },
 ];
 
@@ -34,12 +33,15 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--background)]/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 font-serif text-xl">
-          <Scissors size={20} className="text-[var(--accent)]" />
+        <div
+          className="flex select-none items-center gap-2 font-serif text-xl text-[var(--foreground)]"
+          aria-label="Lumière"
+        >
+          <Scissors size={20} className="text-[var(--accent)]" aria-hidden />
           <span className="tracking-wider">LUMIÈRE</span>
-        </Link>
+        </div>
 
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav className="hidden items-center gap-5 md:flex">
           {navLinks.map((link) => {
             const isActive =
               link.href === "/"

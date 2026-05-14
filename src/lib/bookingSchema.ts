@@ -13,6 +13,11 @@ export const bookingSchema = z.object({
     .string()
     .regex(/^\+?[0-9\s\-()]{10,}$/, "Введите корректный номер телефона"),
   comment: z.string().max(300, "Комментарий слишком длинный").optional(),
+  giftCode: z.string().max(32).optional(),
+  /** Демо: подтверждение депозита без реальной оплаты */
+  depositPaid: z.boolean().refine((v) => v === true, {
+    message: "Подтвердите внесение депозита за слот (в демо — без списания с карты)",
+  }),
 });
 
 export type BookingFormValues = z.infer<typeof bookingSchema>;

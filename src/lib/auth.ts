@@ -31,8 +31,12 @@ function writeUsers(users: AuthUserRecord[]): void {
 }
 
 function toAuthUser(record: AuthUserRecord): AuthUser {
-  const { password: _password, ...user } = record;
-  return user;
+  return {
+    id: record.id,
+    name: record.name,
+    email: record.email,
+    phone: record.phone,
+  };
 }
 
 export function getCurrentUser(): AuthUser | null {
