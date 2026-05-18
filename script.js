@@ -3,6 +3,9 @@
  * Тарифы, расчёт и UI связаны через параметры (без глобальных DOM-переменных).
  */
 
+/** Ключ в localStorage — по нему браузер находит сохранённые настройки */
+var STORAGE_KEY = "serviceCalculatorState";
+
 /** Все тарифы в одном месте; в recalculate() передаётся как аргумент */
 var PRICES = {
   trip: 500,
@@ -162,6 +165,128 @@ function getSelectedRadioValue(doc, groupName) {
   return "";
 }
 
+/** Включить радиокнопку с нужным value в группе name */
+function setRadioByName(doc, groupName, value) {
+  var list = doc.querySelectorAll('input[name="' + groupName + '"]');
+  var i;
+  var found = false;
+  for (i = 0; i < list.length; i++) {
+    if (list[i].value === value) {
+      list[i].checked = true;
+      found = true;
+    }
+  }
+  return found;
+}
+
+/**
+ * Читаем JSON из localStorage (после перезагрузки страницы).
+ * Если данных нет или они повреждены — возвращаем null.
+ */
+function loadStateFromLocalStorage() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return null;
+    }
+    return JSON.parse(raw);
+  } catch (err) {
+    return null;
+  }
+}
+
+/**
+ * Записываем в localStorage выбор услуги, поля и итог.
+ * Вызывается после каждого пересчёта.
+ */
+function saveStateToLocalStorage(state, totalRub, tripRub, serviceRub, serviceLabel) {
+  var payload = {
+    category: state.category,
+    cleaning: {
+      type: state.cleaning.type,
+      sqm: state.cleaning.sqm,
+    },
+    repair: {
+      type: state.repair.type,
+      sqm: state.repair.sqm,
+      demolition: state.repair.demolition,
+      garbage: state.repair.garbage,
+    },
+    care: {
+      type: state.care.type,
+      hours: state.care.hours,
+    },
+    totalRub: totalRub,
+    tripRub: tripRub,
+    serviceRub: serviceRub,
+    serviceLabel: serviceLabel,
+  };
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch (err) {
+    /* Память недоступна (режим инкогнито и т.п.) — калькулятор всё равно работает */
+  }
+}
+
+/**
+ * Восстанавливаем форму из сохранённого объекта (до первого пересчёта).
+ * Возвращает true, если данные применились.
+ */
+function applyFormState(doc, saved) {
+  if (!saved || !saved.category) {
+    return false;
+  }
+
+  if (!setRadioByName(doc, "category", saved.category)) {
+    return false;
+  }
+
+  if (saved.cleaning) {
+    setRadioByName(doc, "cleaning-type", saved.cleaning.type || "full");
+    if (saved.cleaning.sqm !== undefined && saved.cleaning.sqm !== null) {
+      doc.getElementById("cleaning-sqm").value = saved.cleaning.sqm;
+    }
+  }
+
+  if (saved.repair) {
+    setRadioByName(doc, "repair-type", saved.repair.type || "full");
+    if (saved.repair.sqm !== undefined && saved.repair.sqm !== null) {
+      doc.getElementById("repair-sqm").value = saved.repair.sqm;
+    }
+    doc.getElementById("repair-demolition").checked = !!saved.repair.demolition;
+    doc.getElementById("repair-garbage").checked = !!saved.repair.garbage;
+  }
+
+  if (saved.care) {
+    setRadioByName(doc, "care-type", saved.care.type || "elderly");
+    if (saved.care.hours !== undefined && saved.care.hours !== null) {
+      doc.getElementById("care-hours").value = saved.care.hours;
+    }
+  }
+
+  return true;
+}
+
+/** Быстро показать сохранённый итог, пока идёт полный пересчёт (опционально при загрузке) */
+function renderSavedTotal(refs, saved) {
+  if (saved.totalRub === undefined || saved.totalRub === null) {
+    return;
+  }
+  refs.totalSumEl.textContent =
+    Number(saved.totalRub).toLocaleString("ru-RU") + " ₽";
+  if (saved.tripRub !== undefined && saved.serviceLabel) {
+    refs.breakdownEl.textContent =
+      "Выезд: " +
+      Number(saved.tripRub).toLocaleString("ru-RU") +
+      " ₽ + " +
+      saved.serviceLabel +
+      ": " +
+      Number(saved.serviceRub || 0).toLocaleString("ru-RU") +
+      " ₽";
+  }
+}
+
 /** Собираем данные формы в объект — его передаём в расчёт, а не читаем DOM внутри Service */
 function readFormState(doc, refs) {
   return {
@@ -260,12 +385,24 @@ function recalculate(doc, refs, services, prices) {
   var service = services[state.category];
   if (!service) {
     renderTotal(refs, prices.trip, "—", 0);
+    saveStateToLocalStorage(state, prices.trip, prices.trip, 0, "—");
     return;
   }
 
   var input = inputForCategory(state);
   var serviceRub = calculateServiceCost(service, prices, input);
+  var totalRub = prices.trip + serviceRub;
+
   renderTotal(refs, prices.trip, service.label, serviceRub);
+
+  /* Сохраняем всё, что видит пользователь, чтобы после F5 ничего не потерялось */
+  saveStateToLocalStorage(
+    state,
+    totalRub,
+    prices.trip,
+    serviceRub,
+    service.label
+  );
 }
 
 function bindEvents(doc, refs, services, prices) {
@@ -298,6 +435,14 @@ function initCalculator(doc) {
 
   var services = createServices();
   bindEvents(doc, refs, services, PRICES);
+
+  /* 1) подставляем сохранённые поля; 2) пересчитываем и снова пишем в localStorage */
+  var saved = loadStateFromLocalStorage();
+  if (saved) {
+    applyFormState(doc, saved);
+    renderSavedTotal(refs, saved);
+  }
+
   recalculate(doc, refs, services, PRICES);
 }
 
