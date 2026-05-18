@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Калькулятор стоимости услуг — V1</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        line-height: 1.5;
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        background: #f4f6f8;
+        color: #1a1a1a;
+      }
+
+      h1 {
+        font-size: 1.35rem;
+        margin: 0 0 0.25rem;
+      }
+
+      .subtitle {
+        color: #555;
+        font-size: 0.9rem;
+        margin-bottom: 1.25rem;
+      }
+
+      fieldset {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #fff;
+      }
+
+      legend {
+        font-weight: 600;
+        padding: 0 0.25rem;
+      }
+
+      label.option {
+        display: block;
+        margin: 0.5rem 0;
+        cursor: pointer;
+      }
+
+      label.option input {
+        margin-right: 0.4rem;
+      }
+
+      .row {
+        margin-top: 0.75rem;
+      }
+
+      .row label {
+        display: block;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .row input[type="number"] {
+        width: 100%;
+        max-width: 12rem;
+        padding: 0.4rem 0.5rem;
+        font-size: 1rem;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      #total-box {
+        background: #1e4d3a;
+        color: #fff;
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+        font-size: 1.1rem;
+      }
+
+      #total-box strong {
+        font-size: 1.5rem;
+        display: block;
+        margin-top: 0.35rem;
+      }
+
+      #breakdown {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+      }
+
+      footer.help {
+        margin-top: 1.5rem;
+        font-size: 0.8rem;
+        color: #666;
+        border-top: 1px dashed #ccc;
+        padding-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Калькулятор стоимости услуг</h1>
+    <p class="subtitle">Учебный проект V1 — один файл, без npm</p>
+
+    <!-- Шаг 1: выбор категории услуги -->
+    <fieldset>
+      <legend>Категория услуги</legend>
+      <label class="option">
+        <input type="radio" name="category" value="cleaning" checked />
+        Клининг
+      </label>
+      <label class="option">
+        <input type="radio" name="category" value="repair" />
+        Ремонт квартиры
+      </label>
+      <label class="option">
+        <input type="radio" name="category" value="care" />
+        Уход за людьми
+      </label>
+    </fieldset>
+
+    <!-- Опции клининга (показываются только для клининга) -->
+    <fieldset id="panel-cleaning">
+      <legend>Клининг — вариант</legend>
+      <label class="option">
+        <input type="radio" name="cleaning-type" value="full" checked />
+        Полный — 2000 ₽
+      </label>
+      <label class="option">
+        <input type="radio" name="cleaning-type" value="room" />
+        Комната — 1000 ₽
+      </label>
+      <label class="option">
+        <input type="radio" name="cleaning-type" value="area" />
+        Площадь — 50 ₽/м²
+      </label>
+      <div class="row" id="cleaning-area-row">
+        <label for="cleaning-sqm">Площадь (м²)</label>
+        <input type="number" id="cleaning-sqm" min="0" step="1" value="10" />
+      </div>
+    </fieldset>
+
+    <!-- Опции ремонта -->
+    <fieldset id="panel-repair" class="hidden">
+      <legend>Ремонт — основной вариант</legend>
+      <label class="option">
+        <input type="radio" name="repair-type" value="full" checked />
+        Полный — 5000 ₽
+      </label>
+      <label class="option">
+        <input type="radio" name="repair-type" value="room" />
+        Комната — 2000 ₽
+      </label>
+      <label class="option">
+        <input type="radio" name="repair-type" value="area" />
+        Площадь — 200 ₽/м²
+      </label>
+      <div class="row hidden" id="repair-area-row">
+        <label for="repair-sqm">Площадь (м²)</label>
+        <input type="number" id="repair-sqm" min="0" step="1" value="10" />
+      </div>
+      <p style="margin: 0.75rem 0 0.25rem; font-size: 0.9rem">Дополнительно:</p>
+      <label class="option">
+        <input type="checkbox" id="repair-demolition" />
+        Демонтаж — +1500 ₽
+      </label>
+      <label class="option">
+        <input type="checkbox" id="repair-garbage" />
+        Вывоз мусора — +800 ₽
+      </label>
+    </fieldset>
+
+    <!-- Опции ухода за людьми -->
+    <fieldset id="panel-care" class="hidden">
+      <legend>Уход — тип</legend>
+      <label class="option">
+        <input type="radio" name="care-type" value="elderly" checked />
+        Пожилой — 300 ₽/час
+      </label>
+      <label class="option">
+        <input type="radio" name="care-type" value="disabled" />
+        Инвалид — 400 ₽/час
+      </label>
+      <label class="option">
+        <input type="radio" name="care-type" value="child" />
+        Ребёнок — 250 ₽/час
+      </label>
+      <label class="option">
+        <input type="radio" name="care-type" value="time" />
+        Время (общий тариф) — 300 ₽/час
+      </label>
+      <div class="row">
+        <label for="care-hours">Количество часов</label>
+        <input type="number" id="care-hours" min="0" step="1" value="2" />
+      </div>
+    </fieldset>
+
+  <!-- Итог: обновляется при любом изменении полей -->
+    <div id="total-box">
+      <span>Итого</span>
+      <strong id="total-sum">—</strong>
+      <div id="breakdown"></div>
+    </div>
+
+    <footer class="help">
+      Откройте этот файл в браузере (двойной клик по index.html). Сервер не
+      нужен.
+    </footer>
+
+    <script>
+      /*
+       * ============================================================
+       * ТАРИФЫ — все цены в одном объекте (легко менять новичку)
+       * ============================================================
+       * Выезд добавляется к любой услуге автоматически в recalculate().
+       */
+      var PRICES = {
+        trip: 500,
+        cleaning: {
+          full: 2000,
+          room: 1000,
+          perSqm: 50,
+        },
+        repair: {
+          full: 5000,
+          room: 2000,
+          perSqm: 200,
+          demolition: 1500,
+          garbage: 800,
+        },
+        care: {
+          elderly: 300,
+          disabled: 400,
+          child: 250,
+          time: 300,
+        },
+      };
+
+      // Ссылки на элементы (один раз при загрузке страницы)
+      var panelCleaning = document.getElementById("panel-cleaning");
+      var panelRepair = document.getElementById("panel-repair");
+      var panelCare = document.getElementById("panel-care");
+      var cleaningAreaRow = document.getElementById("cleaning-area-row");
+      var repairAreaRow = document.getElementById("repair-area-row");
+      var totalSumEl = document.getElementById("total-sum");
+      var breakdownEl = document.getElementById("breakdown");
+
+      // Читает число из поля; отрицательные заменяем на 0
+      function readNumber(inputId) {
+        var el = document.getElementById(inputId);
+        var n = Number(el.value);
+        if (isNaN(n) || n < 0) {
+          n = 0;
+          el.value = n;
+        }
+        return n;
+      }
+
+      function getSelectedRadio(name) {
+        var list = document.querySelectorAll('input[name="' + name + '"]');
+        var i;
+        for (i = 0; i < list.length; i++) {
+          if (list[i].checked) {
+            return list[i].value;
+          }
+        }
+        return "";
+      }
+
+      // Стоимость услуги БЕЗ выезда — отдельная функция на категорию
+      function serviceCostCleaning() {
+        var type = getSelectedRadio("cleaning-type");
+        if (type === "full") {
+          return PRICES.cleaning.full;
+        }
+        if (type === "room") {
+          return PRICES.cleaning.room;
+        }
+        if (type === "area") {
+          return readNumber("cleaning-sqm") * PRICES.cleaning.perSqm;
+        }
+        return 0;
+      }
+
+      function serviceCostRepair() {
+        var type = getSelectedRadio("repair-type");
+        var cost = 0;
+
+        if (type === "full") {
+          cost = PRICES.repair.full;
+        } else if (type === "room") {
+          cost = PRICES.repair.room;
+        } else if (type === "area") {
+          cost = readNumber("repair-sqm") * PRICES.repair.perSqm;
+        }
+
+        // Чекбоксы независимы от радиокнопок «полный / комната / площадь»
+        if (document.getElementById("repair-demolition").checked) {
+          cost = cost + PRICES.repair.demolition;
+        }
+        if (document.getElementById("repair-garbage").checked) {
+          cost = cost + PRICES.repair.garbage;
+        }
+
+        return cost;
+      }
+
+      function serviceCostCare() {
+        var type = getSelectedRadio("care-type");
+        var hours = readNumber("care-hours");
+        var rate = PRICES.care.elderly;
+
+        if (type === "disabled") {
+          rate = PRICES.care.disabled;
+        } else if (type === "child") {
+          rate = PRICES.care.child;
+        } else if (type === "time") {
+          rate = PRICES.care.time;
+        }
+
+        return rate * hours;
+      }
+
+      // Показать нужную панель опций и поле «площадь» только когда выбрана площадь
+      function updatePanels() {
+        var category = getSelectedRadio("category");
+
+        panelCleaning.className =
+          category === "cleaning" ? "" : "hidden";
+        panelRepair.className = category === "repair" ? "" : "hidden";
+        panelCare.className = category === "care" ? "" : "hidden";
+
+        var cleaningType = getSelectedRadio("cleaning-type");
+        cleaningAreaRow.className =
+          category === "cleaning" && cleaningType === "area" ? "row" : "row hidden";
+
+        var repairType = getSelectedRadio("repair-type");
+        repairAreaRow.className =
+          category === "repair" && repairType === "area" ? "row" : "row hidden";
+      }
+
+      /*
+       * ГЛАВНЫЙ ПЕРЕСЧЁТ
+       * 1) узнаём категорию
+       * 2) считаем стоимость услуги
+       * 3) прибавляем выезд
+       * 4) выводим на экран (целые рубли)
+       */
+      function recalculate() {
+        updatePanels();
+
+        var category = getSelectedRadio("category");
+        var service = 0;
+        var serviceLabel = "";
+
+        if (category === "cleaning") {
+          service = serviceCostCleaning();
+          serviceLabel = "Клининг";
+        } else if (category === "repair") {
+          service = serviceCostRepair();
+          serviceLabel = "Ремонт";
+        } else if (category === "care") {
+          service = serviceCostCare();
+          serviceLabel = "Уход";
+        }
+
+        var trip = PRICES.trip;
+        var total = trip + service;
+
+        totalSumEl.textContent = total.toLocaleString("ru-RU") + " ₽";
+        breakdownEl.textContent =
+          "Выезд: " +
+          trip.toLocaleString("ru-RU") +
+          " ₽ + " +
+          serviceLabel +
+          ": " +
+          service.toLocaleString("ru-RU") +
+          " ₽";
+      }
+
+      // Любое изменение — сразу пересчёт (без кнопки «Рассчитать»)
+      function onAnyChange() {
+        recalculate();
+      }
+
+      var inputs = document.querySelectorAll("input");
+      var i;
+      for (i = 0; i < inputs.length; i++) {
+        inputs[i].addEventListener("change", onAnyChange);
+        inputs[i].addEventListener("input", onAnyChange);
+      }
+
+      recalculate();
+    </script>
+
+    <!--
+    ============================================================
+    ИНСТРУКЦИЯ ПО ЗАПУСКУ
+    ============================================================
+    1. Сохраните файл как index.html
+    2. Откройте его в браузере (Chrome, Firefox, Edge):
+       двойной щелчок по файлу или перетащите файл в окно браузера
+    3. npm, Node.js и интернет не нужны
+
+    Примеры из задания:
+    - Клининг, площадь 10 м² → 500 + 10×50 = 1000 ₽
+    - Ремонт полный + демонтаж → 500 + 5000 + 1500 = 7000 ₽
+    - Уход пожилой, 2 ч → 500 + 300×2 = 1100 ₽
+    ============================================================
+    -->
+  </body>
+</html>
