@@ -1,49 +1,60 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { AuthProvider } from "@/components/auth/AuthProvider";
+import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
-const inter = Inter({
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin", "cyrillic"],
-  variable: "--font-inter",
-  display: "swap",
 });
 
-const playfair = Playfair_Display({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-playfair",
-  display: "swap",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Lumière — парикмахерская и салон красоты",
+  title: "Калькулятор услуг",
   description:
-    "Современная парикмахерская в центре города. Стрижки, окрашивание, укладки, уход. Онлайн-запись к лучшим мастерам.",
-  keywords: [
-    "парикмахерская",
-    "салон красоты",
-    "запись онлайн",
-    "стрижка",
-    "окрашивание",
-    "Москва",
-  ],
+    "Расчёт стоимости клининга, ремонта и фриланс-работ — учебный проект с прозрачной структурой.",
 };
+
+const nav = [
+  { href: "/cleaning", label: "Клининг" },
+  { href: "/repair", label: "Ремонт" },
+  { href: "/freelance", label: "Фриланс" },
+] as const;
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="flex min-h-screen flex-col">
-        <AuthProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </AuthProvider>
+    <html lang="ru" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="min-h-screen antialiased">
+        <header className="border-b border-[var(--border)] bg-[var(--background-soft)]/80 backdrop-blur">
+          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
+            <Link href="/" className="text-lg font-semibold tracking-tight">
+              <span className="text-[var(--accent)]">Calc</span>
+              <span className="text-[var(--foreground-muted)]">Services</span>
+            </Link>
+            <nav className="flex flex-wrap gap-1">
+              {nav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="rounded-lg px-3 py-2 text-sm text-[var(--foreground-muted)] transition-colors hover:bg-[var(--background)] hover:text-[var(--foreground)]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </header>
+        <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">{children}</main>
+        <footer className="border-t border-[var(--border)] py-6 text-center text-xs text-[var(--foreground-muted)]">
+          Учебный проект — логика цен в{" "}
+          <code className="font-mono text-[var(--accent)]">src/lib/pricing</code>
+        </footer>
       </body>
     </html>
   );
