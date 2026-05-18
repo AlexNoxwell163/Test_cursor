@@ -1,0 +1,120 @@
+/* Стили калькулятора V2 — отдельно от разметки и логики */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: #f4f6f8;
+  color: #1a1a1a;
+}
+
+h1 {
+  font-size: 1.35rem;
+  margin: 0 0 0.25rem;
+}
+
+.subtitle {
+  color: #555;
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+fieldset {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #fff;
+}
+
+legend {
+  font-weight: 600;
+  padding: 0 0.25rem;
+}
+
+label.option {
+  display: block;
+  margin: 0.5rem 0;
+  cursor: pointer;
+}
+
+label.option input {
+  margin-right: 0.4rem;
+}
+
+.row {
+  margin-top: 0.75rem;
+}
+
+.row label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.row input[type="number"] {
+  width: 100%;
+  max-width: 12rem;
+  padding: 0.4rem 0.5rem;
+  font-size: 1rem;
+}
+
+/* Подсветка поля и текст ошибки — видны только при неверном вводе */
+.row input.input-invalid {
+  border: 1px solid #b00020;
+  outline: 2px solid rgba(176, 0, 32, 0.2);
+}
+
+.field-error {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: #b00020;
+  line-height: 1.35;
+}
+
+.field-error.hidden {
+  display: none;
+}
+
+.hidden {
+  display: none;
+}
+
+.extras-title {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.9rem;
+}
+
+#total-box {
+  background: #1e4d3a;
+  color: #fff;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 1.1rem;
+}
+
+#total-box strong {
+  font-size: 1.5rem;
+  display: block;
+  margin-top: 0.35rem;
+}
+
+#breakdown {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-top: 0.5rem;
+}
+
+footer.help {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  color: #666;
+  border-top: 1px dashed #ccc;
+  padding-top: 1rem;
+}
